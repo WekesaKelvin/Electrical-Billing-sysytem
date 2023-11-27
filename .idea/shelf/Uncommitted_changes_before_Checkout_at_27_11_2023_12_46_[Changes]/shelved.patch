@@ -1,0 +1,82 @@
+Index: src/Electricity/DepositDetails.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Electricity;\r\n\r\nimport java.awt.*;\r\nimport java.awt.event.*;\r\nimport javax.swing.*;\r\nimport java.sql.*;\r\nimport net.proteanit.sql.DbUtils; //Requires external library\r\n\r\npublic class DepositDetails extends JFrame implements ActionListener{\r\n \r\n    JTable table;\r\n    JButton button1, button2;\r\n    JLabel label1, label2;\r\n    Choice choice1, choice2;\r\n    String x[] = {\"Meter Number\",\"Month\",\"Units\",\"Total Bill\",\"Status\"};\r\n    String y[][] = new String[40][8];\r\n    int i=0, j=0;\r\n    DepositDetails(){\r\n        super(\"Deposit Details\");\r\n        setSize(700,750);\r\n        setLocation(600,150);\r\n        setLayout(null);\r\n        getContentPane().setBackground(Color.WHITE);\r\n        \r\n        label1 = new JLabel(\"Sort by Meter Number\");\r\n        label1.setBounds(20, 20, 150, 20);\r\n        add(label1);\r\n        \r\n        choice1 = new Choice();\r\n        \r\n        label2 = new JLabel(\"Sort By Month\");\r\n        label2.setBounds(400, 20, 100, 20);\r\n        add(label2);\r\n        \r\n        choice2 = new Choice();\r\n        \r\n        table = new JTable(y,x);\r\n        \r\n        try{\r\n            Conn c  = new Conn();\r\n            String s1 = \"select * from bill\";\r\n            ResultSet rs  = c.s.executeQuery(s1);\r\n            \r\n            table.setModel(DbUtils.resultSetToTableModel(rs));\r\n            \r\n            String str2 = \"select * from customer\";\r\n            rs = c.s.executeQuery(str2);\r\n            while(rs.next()){\r\n                choice1.add(rs.getString(\"meter\"));\r\n            }\r\n            \r\n            \r\n        }catch(Exception e){\r\n            e.printStackTrace();\r\n        }\r\n        \r\n        choice1.setBounds(180,20, 150, 20);\r\n        add(choice1);\r\n        \r\n        \r\n        choice2.setBounds(520, 20, 150, 20);\r\n        choice2.add(\"January\");\r\n        choice2.add(\"February\");\r\n        choice2.add(\"March\");\r\n        choice2.add(\"April\");\r\n        choice2.add(\"May\");\r\n        choice2.add(\"June\");\r\n        choice2.add(\"July\");\r\n        choice2.add(\"August\");\r\n        choice2.add(\"September\");\r\n        choice2.add(\"October\");\r\n        choice2.add(\"November\");\r\n        choice2.add(\"December\");\r\n        add(choice2);\r\n        \r\n        \r\n        button1 = new JButton(\"Search\");\r\n        button1.setBounds(20, 70, 80, 20);\r\n        button1.addActionListener(this);\r\n        add(button1);\r\n        \r\n        button2 = new JButton(\"Print\");\r\n        button2.setBounds(120, 70, 80, 20);\r\n        button2.addActionListener(this);\r\n        add(button2);\r\n        \r\n        JScrollPane sp = new JScrollPane(table);\r\n        sp.setBounds(0, 100, 700, 650);\r\n        add(sp);\r\n        \r\n    }\r\n    public void actionPerformed(ActionEvent ae){\r\n        if(ae.getSource() == button1){\r\n            String str = \"select * from bill where meter = '\"+choice1.getSelectedItem()+\"' AND month = '\"+choice2.getSelectedItem()+\"'\";\r\n            try{\r\n                Conn c = new Conn();\r\n                ResultSet rs = c.s.executeQuery(str);\r\n                table.setModel(DbUtils.resultSetToTableModel(rs));\r\n            }catch(Exception e){}\r\n        }else if(ae.getSource() == button2){\r\n            try{\r\n                table.print();\r\n            }catch(Exception e){}\r\n        }\r\n    }\r\n    \r\n    public static void main(String[] args){\r\n        new DepositDetails().setVisible(true);\r\n    }\r\n    \r\n}\r\n
+===================================================================
+diff --git a/src/Electricity/DepositDetails.java b/src/Electricity/DepositDetails.java
+--- a/src/Electricity/DepositDetails.java	
++++ b/src/Electricity/DepositDetails.java	
+@@ -1,10 +1,11 @@
+ package Electricity;
+ 
+-import java.awt.*;
+-import java.awt.event.*;
+ import javax.swing.*;
+-import java.sql.*;
+-import net.proteanit.sql.DbUtils; //Requires external library
++import java.awt.*;
++import java.awt.event.ActionEvent;
++import java.awt.event.ActionListener;
++import java.sql.ResultSet;
++
+ 
+ public class DepositDetails extends JFrame implements ActionListener{
+  
+@@ -41,7 +42,7 @@
+             String s1 = "select * from bill";
+             ResultSet rs  = c.s.executeQuery(s1);
+             
+-            table.setModel(DbUtils.resultSetToTableModel(rs));
++
+             
+             String str2 = "select * from customer";
+             rs = c.s.executeQuery(str2);
+@@ -95,7 +96,7 @@
+             try{
+                 Conn c = new Conn();
+                 ResultSet rs = c.s.executeQuery(str);
+-                table.setModel(DbUtils.resultSetToTableModel(rs));
++
+             }catch(Exception e){}
+         }else if(ae.getSource() == button2){
+             try{
+Index: src/Electricity/BillDetails.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Electricity;\r\n\r\nimport net.proteanit.sql.DbUtils;\r\n\r\nimport javax.swing.*;\r\nimport java.awt.*;\r\nimport java.sql.ResultSet;\r\n\r\npublic class BillDetails extends JFrame{\r\n \r\n    JTable table;\r\n    String x[] = {\"Meter Number\",\"Month\",\"Units\",\"Total Bill\",\"Status\"};\r\n    String y[][] = new String[40][8];\r\n    int i=0, j=0;\r\n    BillDetails(String meter){\r\n        super(\"Bill Details\");\r\n        setSize(700,650);\r\n        setLocation(600,150);\r\n        setLayout(null);\r\n        getContentPane().setBackground(Color.WHITE);\r\n        \r\n        table = new JTable(y,x);\r\n        \r\n        try{\r\n            Conn c  = new Conn();\r\n            String s1 = \"select * from bill where meter = \" + meter;\r\n            ResultSet rs  = c.s.executeQuery(s1);\r\n            \r\n            table.setModel(DbUtils.resultSetToTableModel(rs));\r\n            \r\n        }catch(Exception e){\r\n            e.printStackTrace();\r\n        }\r\n        \r\n        \r\n        JScrollPane sp = new JScrollPane(table);\r\n        sp.setBounds(0, 0, 700, 650);\r\n        add(sp);\r\n        \r\n    }\r\n    \r\n    public static void main(String[] args){\r\n        new BillDetails(\"\").setVisible(true);\r\n    }\r\n    \r\n}\r\n
+===================================================================
+diff --git a/src/Electricity/BillDetails.java b/src/Electricity/BillDetails.java
+--- a/src/Electricity/BillDetails.java	
++++ b/src/Electricity/BillDetails.java	
+@@ -1,6 +1,6 @@
+ package Electricity;
+ 
+-import net.proteanit.sql.DbUtils;
++
+ 
+ import javax.swing.*;
+ import java.awt.*;
+@@ -8,10 +8,14 @@
+ 
+ public class BillDetails extends JFrame{
+  
++    private static final String DbUtils = null;
+     JTable table;
+     String x[] = {"Meter Number","Month","Units","Total Bill","Status"};
+     String y[][] = new String[40][8];
+     int i=0, j=0;
++    /**
++     * @param meter
++     */
+     BillDetails(String meter){
+         super("Bill Details");
+         setSize(700,650);
+@@ -26,7 +30,7 @@
+             String s1 = "select * from bill where meter = " + meter;
+             ResultSet rs  = c.s.executeQuery(s1);
+             
+-            table.setModel(DbUtils.resultSetToTableModel(rs));
++
+             
+         }catch(Exception e){
+             e.printStackTrace();
